@@ -16,7 +16,7 @@ namespace MergeSort
             //generatore random
             Random rnd = new Random();
 
-            //caricamento lista originale
+            //caricamento lista
             Console.WriteLine("elementi della lista originale:");
             for (int i = 0; i < 10; i++)
             {
@@ -29,7 +29,7 @@ namespace MergeSort
             lista = MergeSort(lista);
 
             //stampa lista ordinata
-            Console.WriteLine("Sorted array elements: ");
+            Console.WriteLine("elementi ddella lista ordinati: ");
             foreach (int a in lista)
                 Console.Write($"{a} ");
 
@@ -38,58 +38,70 @@ namespace MergeSort
 
         private static List<int> MergeSort(List<int> lista)
         {
+            //controllo per far concludere il loop
+            if (lista.Count <= 1)
+                return lista;
+
             List<int> sx = new List<int>();
             List<int> dx = new List<int>();
 
-            //divisione 
+            //divisione
             int centro = lista.Count / 2;
-            for (int i = 0; i < centro; i++)
-            {
-                sx.Add(lista[i]);
-            }
 
-            for (int i = centro; i < lista.Count; i++)
+            Task parte_sx = Task.Factory.StartNew(() =>
             {
+                for (int i = 0; i < centro; i++)
+                    sx.Add(lista[i]);
+            });
+
+            Task parte_dx = Task.Factory.StartNew(() =>
+            {
+                for (int i = centro; i < lista.Count; i++)
                 dx.Add(lista[i]);
-            }
+            });
 
-            sx = MergeSort(sx);
-            dx = MergeSort(dx);
+            Task.WaitAll(parte_dx, parte_sx);
+
+            Task merge_sx = Task.Factory.StartNew(() => sx = MergeSort(sx));
+            Task merge_dx = Task.Factory.StartNew(() => dx = MergeSort(dx));
+
+            Task.WaitAll(merge_sx, merge_dx);
+
             return Merge(sx, dx);
         }
 
         private static List<int> Merge(List<int> sx, List<int> dx)
         {
-            List<int> result = new List<int>();
+            List<int> ordinata = new List<int>();
 
             while (sx.Count > 0 || dx.Count > 0)
             {
                 if (sx.Count > 0 && dx.Count > 0)
                 {
-                    if (sx[0] <= dx[0])  //Comparing First two elements to see which is smaller
+                    //comparazione fra i primi due elementi
+                    if (sx[0] <= dx[0])
                     {
-                        result.Add(sx[0]);
-                        sx.Remove(sx[0]);      //Rest of the list minus the first element
+                        ordinata.Add(sx[0]);  //aggiunta alla lista finale
+                        sx.Remove(sx[0]);   //rimozione dalla lista originale
                     }
                     else
                     {
-                        result.Add(dx[0]);
+                        ordinata.Add(dx[0]);
                         dx.Remove(dx[0]);
                     }
                 }
                 else if (sx.Count > 0)
                 {
-                    result.Add(sx[0]);
+                    ordinata.Add(sx[0]);
                     sx.Remove(sx[0]);
                 }
-                else if (dx.Count > 0)
+                else
                 {
-                    result.Add(dx[0]);
-
+                    ordinata.Add(dx[0]);
                     dx.Remove(dx[0]);
                 }
             }
-            return result;
+            return ordinata;
         }
     }
 }
