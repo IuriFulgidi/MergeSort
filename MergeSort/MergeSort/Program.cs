@@ -29,7 +29,7 @@ namespace MergeSort
             lista = MergeSort(lista);
 
             //stampa lista ordinata
-            Console.WriteLine("elementi ddella lista ordinati: ");
+            Console.WriteLine("elementi della lista ordinati: ");
             foreach (int a in lista)
                 Console.Write($"{a} ");
 
@@ -81,24 +81,24 @@ namespace MergeSort
                     //comparazione fra i primi due elementi
                     if (sx[0] <= dx[0])
                     {
-                        ordinata.Add(sx[0]);  //aggiunta alla lista finale
-                        sx.Remove(sx[0]);   //rimozione dalla lista originale
+                        Task aggiunta = Task.Factory.StartNew(() => ordinata.Add(sx[0]));  //aggiunta alla lista finale
+                        Task rimozione = Task.Factory.StartNew(() => sx.Remove(sx[0]));   //rimozione dalla lista originale
                     }
                     else
                     {
-                        ordinata.Add(dx[0]);
-                        dx.Remove(dx[0]);
+                        Task aggiunta = Task.Factory.StartNew(() => ordinata.Add(dx[0]));
+                        Task rimozione = Task.Factory.StartNew(() => dx.Remove(dx[0]));
                     }
                 }
                 else if (sx.Count > 0)
                 {
-                    ordinata.Add(sx[0]);
-                    sx.Remove(sx[0]);
+                    Task aggiunta = Task.Factory.StartNew(() => ordinata.Add(sx[0]));  
+                    Task rimozione = Task.Factory.StartNew(() => sx.Remove(sx[0]));
                 }
                 else
                 {
-                    ordinata.Add(dx[0]);
-                    dx.Remove(dx[0]);
+                    Task aggiunta = Task.Factory.StartNew(() => ordinata.Add(dx[0]));
+                    Task rimozione = Task.Factory.StartNew(() => dx.Remove(dx[0]));
                 }
             }
             return ordinata;
