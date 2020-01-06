@@ -48,24 +48,14 @@ namespace MergeSort
             //divisione
             int centro = lista.Count / 2;
 
-            Task parte_sx = Task.Factory.StartNew(() =>
-            {
-                for (int i = 0; i < centro; i++)
+            for (int i = 0; i < centro; i++)
                     sx.Add(lista[i]);
-            });
 
-            Task parte_dx = Task.Factory.StartNew(() =>
-            {
-                for (int i = centro; i < lista.Count; i++)
-                dx.Add(lista[i]);
-            });
+            for (int i = centro; i < lista.Count; i++)
+                    dx.Add(lista[i]);
 
-            Task.WaitAll(parte_dx, parte_sx);
-
-            Task merge_sx = Task.Factory.StartNew(() => sx = MergeSort(sx));
-            Task merge_dx = Task.Factory.StartNew(() => dx = MergeSort(dx));
-
-            Task.WaitAll(merge_sx, merge_dx);
+            sx = MergeSort(sx);
+            dx = MergeSort(dx);
 
             return Merge(sx, dx);
         }
@@ -78,28 +68,28 @@ namespace MergeSort
             {
                 if (sx.Count > 0 && dx.Count > 0)
                 {
-                    //comparazione fra i primi due elementi
+                    //comparazione fra i due elementi
                     if (sx[0] <= dx[0])
                     {
-                        Task aggiunta = Task.Factory.StartNew(() => ordinata.Add(sx[0]));  //aggiunta alla lista finale
-                        Task rimozione = Task.Factory.StartNew(() => sx.Remove(sx[0]));   //rimozione dalla lista originale
+                        ordinata.Add(sx[0]);  //aggiunta alla lista finale
+                        sx.Remove(sx[0]);   //rimozione dalla lista originale
                     }
                     else
                     {
-                        Task aggiunta = Task.Factory.StartNew(() => ordinata.Add(dx[0]));
-                        Task rimozione = Task.Factory.StartNew(() => dx.Remove(dx[0]));
+                        ordinata.Add(dx[0]);
+                        dx.Remove(dx[0]);
                     }
                 }
                 else if (sx.Count > 0)
                 {
-                    Task aggiunta = Task.Factory.StartNew(() => ordinata.Add(sx[0]));  
-                    Task rimozione = Task.Factory.StartNew(() => sx.Remove(sx[0]));
+                    ordinata.Add(sx[0]);
+                    sx.Remove(sx[0]);   
                 }
-                else
+                else if(dx.Count > 0)
                 {
-                    Task aggiunta = Task.Factory.StartNew(() => ordinata.Add(dx[0]));
-                    Task rimozione = Task.Factory.StartNew(() => dx.Remove(dx[0]));
-                }
+                    ordinata.Add(dx[0]);
+                    dx.Remove(dx[0]);
+                } 
             }
             return ordinata;
         }
